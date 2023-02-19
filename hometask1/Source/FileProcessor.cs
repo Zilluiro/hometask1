@@ -1,6 +1,8 @@
 ﻿using hometask1.Source.Configurations;
 using hometask1.Source.Exceptions;
 using hometask1.Source.Handlers;
+using Quartz;
+using Quartz.Impl;
 
 namespace hometask1.Source
 {
@@ -14,6 +16,8 @@ namespace hometask1.Source
         public bool _stopped = false;
         private int _jobs = 0;
         private object _lock = new object();
+
+        private IScheduler _scheduler;
 
         public FileProcessor(AppSettings config)
         {
@@ -41,10 +45,11 @@ namespace hometask1.Source
             watcher.EnableRaisingEvents = true;
 
             _saver.RemoveDirectory();
+            await SetupMidnightLogger();
             _logger.Log($"The service is running.");
         }
 
-        private async void OnCreated(object sender, FileSystemEventArgs e)
+        private void OnCreated(object sender, FileSystemEventArgs e)
         {
             _logger.Log($"New file has been spotted. Name: {e.Name}");
             if (_stopped)
@@ -101,6 +106,25 @@ namespace hometask1.Source
 
             await _saver.SaveMetaFileAsync();
             _logger.Log("The service has stopped.");
+        }
+
+        private async Task SetupMidnightLogger()
+        {
+            StdSchedulerFactory factory = new StdSchedulerFactory();
+            _scheduler = await factory.GetScheduler();
+            IJobDetail job = JobBuilder.Create<DailyJob>()
+                .WithIdentity(DailyJob.JOB_NAME, DailyJob.GROUP_NAME)
+                .Build();
+            job.JobDataMap.Put("saver", _saver);
+
+            ITrigger trigger = TriggerBuilder.Create()
+                          .WithIdentity(DailyJob.TRIGGER_NAME, DailyJob.GROUP_NAME)
+                          .WithSchedule(CronScheduleBuilder
+                            .DailyAtHourAndMinute(0, 0))
+                          .Build();
+
+            await _scheduler.Start();
+            await _scheduler.ScheduleJob(job, trigger);
         }
     }
 }

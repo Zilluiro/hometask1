@@ -8,8 +8,8 @@ namespace hometask1.Source
         public int ParsedLines { get; private set; }
         public int FoundErrors { get; private set; }
 
-        private List<string> InvalidFiles = new List<string>();
-        private object _lock = new object();
+        private readonly List<string> InvalidFiles = new List<string>();
+        private readonly object _lock = new object();
 
         private MetaStorage() { }
 
@@ -55,7 +55,7 @@ namespace hometask1.Source
             }
         }
 
-        public string ToString()
+        public override string ToString()
         {
             var sb = new StringBuilder();
             lock (_lock)
