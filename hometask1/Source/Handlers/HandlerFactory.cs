@@ -1,4 +1,5 @@
-﻿using hometask1.Source.Handlers.Implementations;
+﻿using hometask1.Source.Exceptions;
+using hometask1.Source.Handlers.Implementations;
 using hometask1.Source.Handlers.Interfaces;
 
 namespace hometask1.Source.Handlers
@@ -13,7 +14,7 @@ namespace hometask1.Source.Handlers
             if (file.EndsWith(".csv"))
                 return new CSVHandler();
 
-            throw new ArgumentException("Wrong filetype");
+            throw new HandlerNotFound("Wrong filetype");
         }
     }
 }

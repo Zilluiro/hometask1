@@ -5,16 +5,25 @@ namespace hometask1.Source
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var fileContent = File.ReadAllText("appsettings.json");
             var appSettings = JsonSerializer.Deserialize<AppSettings>(fileContent);
-            Console.WriteLine(appSettings.OutputConfiguration.Directory);
 
             var fileProcessor = new FileProcessor(appSettings);
-            fileProcessor.Start();
+            await fileProcessor.Start();
+            while (true)
+            {
+                Console.WriteLine("Please select an action:");
+                Console.WriteLine("1.reset\n2.stop");
+                var command = Console.ReadLine();
 
-            Console.ReadLine();
+                switch (command)
+                {
+                    case "1": { fileProcessor.Reset(); break; }
+                    case "2": { await fileProcessor.Stop(); return; }
+                }
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using hometask1.Source.Data;
 using hometask1.Source.Handlers.Interfaces;
 using hometask1.Source.Models;
-using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace hometask1.Source.Handlers.Implementations
@@ -61,75 +60,6 @@ namespace hometask1.Source.Handlers.Implementations
                     return false;
             }
 
-            return true;
-        }
-
-        private bool ProcessName(string name, PaymentInfo payment)
-        {
-            var normalizedName = name.Trim();
-            if (string.IsNullOrEmpty(normalizedName))
-                return false;
-
-            payment.FirstName = normalizedName;
-            return true;
-        }
-
-        private bool ProcessSurname(string name, PaymentInfo payment)
-        {
-            var normalizedName = name.Trim();
-            if (string.IsNullOrEmpty(normalizedName))
-                return false;
-
-            payment.LastName = normalizedName;
-            return true;
-        }
-
-        private bool ProcessAddress(string address, PaymentInfo payment)
-        {
-            var normalizedAddress = address.Trim();
-            if (string.IsNullOrEmpty(normalizedAddress))
-                return false;
-
-            payment.Address = normalizedAddress;
-            return true;
-        }
-
-        private bool ProcessPayment(string paymentString, PaymentInfo paymentObject)
-        {
-            var result = decimal.TryParse(paymentString, out var payment);
-            if (result)
-                paymentObject.Payment = payment;
-
-            return result;
-        }
-
-        private bool ProcessDate(string dateString, PaymentInfo payment)
-        {
-            var result = DateTime.TryParseExact(dateString, "yyyy-dd-MM", new CultureInfo("en-US"),
-                DateTimeStyles.None, out var date);
-
-            if (result)
-                payment.Date = date;
-
-            return result;
-        }
-
-        private bool ProcessAccountNumber(string accountNumberString, PaymentInfo payment)
-        {
-            var result = long.TryParse(accountNumberString, out var accountNumber);
-            if (result)
-                payment.AccountNumber = accountNumber;
-
-            return result;
-        }
-
-        private bool ProcessService(string serviceString, PaymentInfo payment)
-        {
-            var normalizedService = serviceString.Trim();
-            if (string.IsNullOrEmpty(normalizedService))
-                return false;
-
-            payment.Service = normalizedService;
             return true;
         }
     }

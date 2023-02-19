@@ -13,7 +13,7 @@ namespace hometask1.Source
             _output = output;
         }
 
-        public async Task SaveAsync(string filename, List<CityModel> model)
+        public async Task SaveDataFileAsync(string filename, List<CityModel> model)
         {
             var folder = DateTime.Now.ToString("MM-dd-yyyy");
             var path = $"{_output.Directory}{Path.DirectorySeparatorChar}{folder}";
@@ -26,23 +26,36 @@ namespace hometask1.Source
             await JsonSerializer.SerializeAsync(stream, model);
         }
 
+        public async Task SaveMetaFileAsync()
+        {
+            var folder = DateTime.Now.ToString("MM-dd-yyyy");
+            await SaveMetaFileAsync(folder);
+        }
+
+        public async Task SaveMetaFileAsync(string folder)
+        {
+            var path = $"{_output.Directory}{Path.DirectorySeparatorChar}{folder}";
+            var filename = "meta.log";
+            var filepath = $"{path}{Path.DirectorySeparatorChar}{filename}";
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            var meta = MetaStorage.GetInstance();
+            var serialized = meta.ToString();
+
+            await File.WriteAllTextAsync(filepath, serialized);
+        }
+
         public void RemoveDirectory()
         {
             var folder = DateTime.Now.ToString("MM-dd-yyyy");
             var path = $"{_output.Directory}{Path.DirectorySeparatorChar}{folder}";
 
-            if (!IsDirectoryEmpty(path))
-            {
-                var directory = new DirectoryInfo(path);
-                directory.Delete();
-            }
-        }
+            var directory = new DirectoryInfo(path);
 
-        private bool IsDirectoryEmpty(string path)
-        {
-            var items = Directory.EnumerateFileSystemEntries(path);
-            using var enumerator = items.GetEnumerator();
-            return !enumerator.MoveNext();
+            if (Directory.Exists(path))
+                directory.Delete(true);
         }
     }
 }
